@@ -1,0 +1,16 @@
+.content {
+  width: 20vw;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid black;
+  background-color: royalblue;
+  transition: width .35s;
+  overflow-y: auto;
+}
+
+.content[data-hidden=true] {
+  transition: width .35s, border-right 0.35s;
+  width: 0;
+  border-right: 0;
+}

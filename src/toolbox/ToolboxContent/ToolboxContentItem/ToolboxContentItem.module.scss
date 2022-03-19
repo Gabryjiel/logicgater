@@ -1,0 +1,32 @@
+$itemSize: 50px;
+$itemVoid: 5px;
+$itemContentSize: $itemSize - $itemVoid;
+
+@mixin centerGrid {
+  display: grid;
+  place-items: center;
+}
+
+.wrapper {
+  @include centerGrid;
+  width: $itemSize;
+  height: $itemSize;
+  margin: 5px;
+}
+
+.item {
+  @include centerGrid;
+  width: $itemContentSize;
+  height: $itemContentSize;
+  border: 1px solid white;
+  border-radius: 10%;
+  background-color: black;
+  color: yellow;
+  transition: width 0.1s, height 0.1s;
+  cursor: pointer;
+  &:hover {
+    transition: width 0.1s, height 0.1s;
+    width: $itemSize;
+    height: $itemSize;
+  }
+}

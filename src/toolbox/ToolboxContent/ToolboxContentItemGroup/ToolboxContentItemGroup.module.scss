@@ -1,0 +1,25 @@
+.group {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  width: 95%;
+  color: white;
+  font-size: x-large;
+  text-indent: 1em;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid white;
+}
+
+.items {
+  display: flex;
+  justify-content: flex-start;
+  align-self: flex-start;
+  flex-wrap: wrap;
+}

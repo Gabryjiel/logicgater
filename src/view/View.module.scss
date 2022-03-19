@@ -1,0 +1,17 @@
+.view {
+    display: flex;
+}
+
+.view main {
+    flex: 1 0 0;
+    height: 100vh;
+    background-color: forestgreen;
+    background-image: radial-gradient(black 1px, transparent 0);
+    background-size: 40px 40px;
+    background-position: -22px -22px;
+}
+
+.view aside {
+    height: 100vh;
+    background-color: aquamarine;
+}
