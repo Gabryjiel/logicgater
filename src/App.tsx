@@ -1,40 +1,45 @@
-import { AndChip } from "./nodes/and";
-import { BatteryChip } from "./nodes/battery";
-import { LightChip } from "./nodes/light";
-import { ProcessorChip } from "./nodes/processor";
-import { TimerChip } from "./nodes/timer";
+import "./styles/index.css";
+import "./styles/app.css";
+
 import { useAppSelector } from "./providers/redux";
+import { useState } from "react";
+import { Sidebar } from "./components/Sidebar";
+import { ProcessorBoard } from "./nodes/Processor";
 
 export function App() {
-	const motherboard = useAppSelector((state) => state.motherboard.processor);
-	return <Processor chip={motherboard} />;
-}
+  const motherboard = useAppSelector((state) => state.motherboard);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-export function Processor(props: { chip: ProcessorChip }) {
-	return (
-		<div>
-			<span>{props.chip.id}</span>
-			{props.chip.chips.map((chip) => {
-				if (chip instanceof ProcessorChip) {
-					return <Processor key={chip.id} chip={chip} />;
-				}
-				if (chip instanceof BatteryChip) {
-					return <Battery key={chip.id} chip={chip} />;
-				}
-				if (chip instanceof TimerChip) {
-					return <div>{chip.id}</div>;
-				}
-				if (chip instanceof AndChip) {
-					return <div>{chip.id}</div>;
-				}
-				if (chip instanceof LightChip) {
-					return <div>{chip.id}</div>;
-				}
-			})}
-		</div>
-	);
-}
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault();
+    if (!event.currentTarget.classList.contains("container")) {
+      return;
+    }
+    setIsSidebarOpen(false);
+  };
 
-export function Battery(props: { chip: BatteryChip }) {
-	return <div>{`${props.chip.id} ${props.chip.power}`}</div>;
+  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setIsSidebarOpen(true);
+  };
+
+  const handleKeyUp: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault();
+    if (!event.currentTarget.classList.contains("container")) {
+      return;
+    }
+    setIsSidebarOpen(false);
+  };
+
+  return (
+    <div
+      className="container"
+      onClick={handleClick}
+      onKeyUp={handleKeyUp}
+      onContextMenu={handleContextMenu}
+    >
+      <Sidebar isOpen={isSidebarOpen} />
+      <ProcessorBoard chip={motherboard} />
+    </div>
+  );
 }
