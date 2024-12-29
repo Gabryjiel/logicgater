@@ -4,7 +4,10 @@ import { useBoolean } from "../lib/useBoolean";
 import { Actions, useAppDispatch } from "../providers/redux";
 import { DRAG_TYPES } from "../providers/constants";
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
-import { ChipComponent } from "../components/ChipComponent";
+import { BatteryChip } from "./Battery";
+import { AndGateChip } from "./AndGate";
+import { TimerChip } from "./Timer";
+import { LightChip } from "./Light";
 
 export function Processor(props: { chip: ProcessorChip }) {
   const boardOpenBool = useBoolean();
@@ -75,7 +78,22 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
       onDragLeave={handleDragLeave}
     >
       {props.chip.chips.map((chip) => {
-        return <ChipComponent key={chip.id} chip={chip} />;
+        switch (chip.type) {
+          case "PROCESSOR":
+            return <Processor key={chip.id} chip={chip} />;
+          case "BATTERY":
+            return (
+              <BatteryChip key={chip.id} chipId={chip.id} value={chip.power} />
+            );
+          case "AND_GATE":
+            return <AndGateChip key={chip.id} chipId={chip.id} />;
+          case "TIMER":
+            return <TimerChip key={chip.id} chipId={chip.id} />;
+          case "LIGHT":
+            return <LightChip key={chip.id} chipId={chip.id} />;
+          default:
+            return null;
+        }
       })}
 
       {draggedChip ? (

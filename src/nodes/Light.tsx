@@ -1,6 +1,6 @@
 import { BasicChip } from "./Basic";
 
-export function AndGateChip(props: { chipId: string }) {
+export function LightChip(props: { chipId: string }) {
   return (
     <BasicChip
       chipId={props.chipId}
