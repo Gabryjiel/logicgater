@@ -1,8 +1,11 @@
 import { type ChipType, chipFactory } from "../nodes";
-import { Actions, useAppDispatch } from "../providers/redux";
+import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
 
 export function Sidebar(props: { isOpen: boolean }) {
   const dispatch = useAppDispatch();
+  const lastClickedPosition = useAppSelector(
+    (state) => state.motherboard.lastClickedPosition,
+  );
 
   const handleSidebarElementClick: React.MouseEventHandler<HTMLDivElement> = (
     event,
@@ -10,8 +13,14 @@ export function Sidebar(props: { isOpen: boolean }) {
     event.preventDefault();
 
     const chipType = event.currentTarget.dataset.chipType;
-    if (chipType) {
-      dispatch(Actions.addChip(chipFactory.create(chipType)));
+    if (chipType && lastClickedPosition) {
+      dispatch(
+        Actions.addChip(
+          chipFactory.create(chipType, { position: lastClickedPosition }),
+        ),
+      );
+
+      dispatch(Actions.updateLastClickedPosition(null));
     }
   };
 

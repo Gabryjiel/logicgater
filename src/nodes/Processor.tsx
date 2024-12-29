@@ -1,33 +1,49 @@
 import { useState } from "react";
-import type { AnyChip, ChipPosition, ProcessorChip } from ".";
+import type { ChipId, ChipPosition, ProcessorChip, ProcessorSubchip } from ".";
 import { useBoolean } from "../lib/useBoolean";
-import { Actions, useAppDispatch } from "../providers/redux";
-import { DRAG_TYPES } from "../providers/constants";
+import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
+import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
 import { BatteryChip } from "./Battery";
 import { AndGateChip } from "./AndGate";
 import { TimerChip } from "./Timer";
 import { LightChip } from "./Light";
 
-export function Processor(props: { chip: ProcessorChip }) {
+export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
+  const chip = useAppSelector(
+    (state) => state.motherboard.chips[props.chipId] as ProcessorChip,
+  );
 
   return (
     <div
-      id={props.chip.id}
+      id={chip.id}
       onClick={boardOpenBool.toggle}
       onKeyUp={boardOpenBool.toggle}
     >
-      <span>{props.chip.id}</span>
-      {boardOpenBool.value ? <ProcessorBoard chip={props.chip} /> : <></>}
+      <span>{chip.id}</span>
+      {boardOpenBool.value ? (
+        <ProcessorBoard chipId={chip.id} chips={chip.chips} />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
 
-export function ProcessorBoard(props: { chip: ProcessorChip }) {
+export function ProcessorBoard(props: {
+  chipId: ChipId;
+  chips: ProcessorSubchip[];
+}) {
   const dispatch = useAppDispatch();
+  const isSidebarOpen = useAppSelector(
+    (state) => state.motherboard.isSidebarOpen,
+  );
+  const lastClickedPosition = useAppSelector(
+    (state) => state.motherboard.lastClickedPosition,
+  );
 
-  const [draggedChip, setDraggedChip] = useState<AnyChip | null>(null);
+  const [draggedChip, setDraggedChip] = useState<ChipId | null>(null);
   const [draggedChipPosition, setDraggedChipPosition] = useState<ChipPosition>({
     x: 0,
     y: 0,
@@ -42,7 +58,7 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
   const handleDragOver: React.DragEventHandler<HTMLDivElement> = (event) => {
     if (event.dataTransfer.types.includes(DRAG_TYPES.CHIP)) {
       event.preventDefault();
-      setDraggedChip(props.chip.chips[0]);
+      setDraggedChip(props.chips[0].chipId);
       setDraggedChipPosition(() => ({
         x: calculateChipPositionFromBrowser(event.pageX),
         y: calculateChipPositionFromBrowser(event.pageY),
@@ -57,7 +73,7 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
 
     dispatch(
       Actions.moveChip({
-        id: chipId,
+        chipId: chipId as ChipId,
         x: calculateChipPositionFromBrowser(event.pageX),
         y: calculateChipPositionFromBrowser(event.pageY),
       }),
@@ -69,6 +85,29 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
     setDraggedChip(null);
   };
 
+  const handleClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault();
+
+    if (
+      (event.target as HTMLDivElement)?.classList.contains("processor-board")
+    ) {
+      if (!isSidebarOpen) {
+        dispatch(Actions.toggleSidebar());
+      }
+
+      dispatch(
+        Actions.updateLastClickedPosition({
+          x: calculateChipPositionFromBrowser(event.pageX),
+          y: calculateChipPositionFromBrowser(event.pageY),
+          processorId: props.chipId,
+        }),
+      );
+    } else if (isSidebarOpen) {
+      dispatch(Actions.toggleSidebar());
+      dispatch(Actions.updateLastClickedPosition(null));
+    }
+  };
+
   return (
     <div
       className="processor-board"
@@ -76,21 +115,29 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
       onDragOver={handleDragOver}
       onDrop={handleDrop}
       onDragLeave={handleDragLeave}
+      onClick={handleClick}
     >
-      {props.chip.chips.map((chip) => {
+      {isSidebarOpen && props.chipId === lastClickedPosition?.processorId ? (
+        <div
+          className="last-clicked-position"
+          style={{
+            top: PIXELS_PER_CHIP * lastClickedPosition.y,
+            left: PIXELS_PER_CHIP * lastClickedPosition.x,
+          }}
+        />
+      ) : null}
+      {props.chips.map((chip) => {
         switch (chip.type) {
           case "PROCESSOR":
-            return <Processor key={chip.id} chip={chip} />;
+            return <Processor key={chip.chipId} chipId={chip.chipId} />;
           case "BATTERY":
-            return (
-              <BatteryChip key={chip.id} chipId={chip.id} value={chip.power} />
-            );
+            return <BatteryChip key={chip.chipId} chipId={chip.chipId} />;
           case "AND_GATE":
-            return <AndGateChip key={chip.id} chipId={chip.id} />;
+            return <AndGateChip key={chip.chipId} chipId={chip.chipId} />;
           case "TIMER":
-            return <TimerChip key={chip.id} chipId={chip.id} />;
+            return <TimerChip key={chip.chipId} chipId={chip.chipId} />;
           case "LIGHT":
-            return <LightChip key={chip.id} chipId={chip.id} />;
+            return <LightChip key={chip.chipId} chipId={chip.chipId} />;
           default:
             return null;
         }
@@ -100,8 +147,8 @@ export function ProcessorBoard(props: { chip: ProcessorChip }) {
         <div
           className="chip-outline"
           style={{
-            left: `${draggedChipPosition.x * 50}px`,
-            top: `${draggedChipPosition.y * 50}px`,
+            left: `${draggedChipPosition.x * PIXELS_PER_CHIP}px`,
+            top: `${draggedChipPosition.y * PIXELS_PER_CHIP}px`,
           }}
         />
       ) : (

@@ -77,8 +77,8 @@
 }
 
 .chip-input {
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
   background-color: yellow;
 }
 
@@ -101,4 +101,12 @@
 .chip-output:hover {
   width: 12px;
   background-color: gold;
+}
+
+.last-clicked-position {
+  width: var(--pixels-per-chip);
+  height: var(--pixels-per-chip);
+  border: 5px solid yellow;
+  background-color: transparent;
+  position: absolute;
 }

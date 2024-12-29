@@ -1,13 +1,20 @@
+import type { BatteryChip as TBatteryChip, ChipId } from ".";
+import { useAppSelector } from "../providers/redux";
 import { BasicChip } from "./Basic";
 
-export function BatteryChip(props: { chipId: string; value: number }) {
+export function BatteryChip(props: { chipId: ChipId }) {
+  const data = useAppSelector(
+    (state) => state.motherboard.chips[props.chipId],
+  ) as TBatteryChip;
+
   return (
     <BasicChip
       chipId={props.chipId}
-      leftInputs={2}
-      bottomInputs={0}
-      position={{ x: 0, y: 0 }}
-      label="Battery"
+      type="BATTERY"
+      inputs={data.inputs}
+      position={data.position}
+      outputs={data.outputs}
+      title={`${data.name} (${data.type}) \n${data.power} [MJ]`}
     />
   );
 }

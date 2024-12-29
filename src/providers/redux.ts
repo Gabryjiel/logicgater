@@ -4,55 +4,53 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  type AnyChip,
-  chipFactory,
-  type ChipPosition,
-  ProcessorSubchip,
-} from "../nodes";
-import { subjectMap, subscriberMap } from "./rxjs";
-import { BehaviorSubject, type Observer } from "rxjs";
+import type { AnyChip, ChipId, ChipConnection, ChipPosition } from "../nodes";
 
-const initialStateForMotherboardSlice = chipFactory.createProcessor();
+type ClickPosition = { processorId: ChipId } & ChipPosition;
+
+const initialState = {
+  chips: {} as Record<ChipId, AnyChip>,
+  connections: new Array<ChipConnection>(),
+  isSidebarOpen: false,
+  lastClickedPosition: null as ClickPosition | null,
+};
 
 export const motherboardSlice = createSlice({
   name: "motherboard",
-  initialState: initialStateForMotherboardSlice,
+  initialState,
   reducers: {
-    addChip: (state, action: PayloadAction<ProcessorSubchip>) => {
-      state.chips.push(action.payload);
-      store.dispatch(undoSlice.actions.addStep(action));
+    addChip: (state, action: PayloadAction<AnyChip>) => {
+      state.chips[action.payload.id] = action.payload;
     },
-    moveChip: (state, action: PayloadAction<ChipPosition & { id: string }>) => {
-      const chipIndex = state.chips.findIndex(
-        (chip) => chip.chipId === action.payload.id,
-      );
+    removeChip: (state, action: PayloadAction<ChipId>) => {
+      const newState = { ...state };
 
-      if (chipIndex === -1) {
-        return;
-      }
-
-      state.chips[chipIndex].position.x = action.payload.x;
-      state.chips[chipIndex].position.y = action.payload.y;
+      newState.chips = { ...state.chips };
+      delete newState.chips[action.payload];
     },
-    addConnection: (
+    addConnection: (state, action: PayloadAction<ChipConnection>) => {
+      state.connections.push(action.payload);
+    },
+    moveChip: (
       state,
-      action: PayloadAction<{ outputId: string; inputId: string }>,
+      action: PayloadAction<ChipPosition & { chipId: ChipId }>,
     ) => {
-      const subject = new BehaviorSubject(0);
-      const subscriber: Observer<number> = {
-        next: (value) => value,
-        complete: () => null,
-        error: () => null,
-      };
-      subjectMap.set(action.payload.outputId, subject);
-      subscriberMap.set(action.payload.inputId, subscriber);
-      console.log(subjectMap);
+      state.chips[action.payload.chipId].position.x = action.payload.x;
+      state.chips[action.payload.chipId].position.y = action.payload.y;
+    },
+    toggleSidebar: (state) => {
+      state.isSidebarOpen = !state.isSidebarOpen;
+    },
+    updateLastClickedPosition: (
+      state,
+      payload: PayloadAction<ClickPosition | null>,
+    ) => {
+      state.lastClickedPosition = payload.payload;
     },
   },
 });
 
-type UndoAction = PayloadAction<any>;
+type UndoAction = PayloadAction<unknown>;
 
 const undoSlice = createSlice({
   name: "undoSlice",
