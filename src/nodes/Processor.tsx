@@ -8,6 +8,7 @@ import { BatteryChip } from "./Battery";
 import { AndGateChip } from "./AndGate";
 import { TimerChip } from "./Timer";
 import { LightChip } from "./Light";
+import { BasicChip } from "./Basic";
 
 export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
@@ -16,18 +17,21 @@ export function Processor(props: { chipId: ChipId }) {
   );
 
   return (
-    <div
-      id={chip.id}
-      onClick={boardOpenBool.toggle}
-      onKeyUp={boardOpenBool.toggle}
-    >
-      <span>{chip.id}</span>
+    <>
+      <BasicChip
+        chipId={props.chipId}
+        type="PROCESSOR"
+        inputs={chip.inputs}
+        outputs={chip.outputs}
+        position={chip.position}
+        title={`${chip.type}\n${chip.name}`}
+      />
       {boardOpenBool.value ? (
         <ProcessorBoard chipId={chip.id} chips={chip.chips} />
       ) : (
         <></>
       )}
-    </div>
+    </>
   );
 }
 
