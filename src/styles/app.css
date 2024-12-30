@@ -107,6 +107,9 @@
   width: var(--pixels-per-chip);
   height: var(--pixels-per-chip);
   position: absolute;
+  transition:
+    top ease-in 0.1s,
+    left ease-in 0.1s;
 
   --s: 10px; /* size of the corners */
   border: 5px solid yellow;
