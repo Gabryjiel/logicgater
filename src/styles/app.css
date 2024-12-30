@@ -106,7 +106,14 @@
 .last-clicked-position {
   width: var(--pixels-per-chip);
   height: var(--pixels-per-chip);
-  border: 5px solid yellow;
-  background-color: transparent;
   position: absolute;
+
+  --s: 10px; /* size of the corners */
+  border: 5px solid yellow;
+  padding: 0px;
+  background: transparent content-box;
+  mask:
+    conic-gradient(#000 0 0) content-box,
+    conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 /
+      calc(100% - var(--s)) calc(100% - var(--s));
 }
