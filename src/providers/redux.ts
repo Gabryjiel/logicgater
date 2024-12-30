@@ -23,10 +23,7 @@ export const motherboardSlice = createSlice({
       state.chips[action.payload.id] = action.payload;
     },
     removeChip: (state, action: PayloadAction<ChipId>) => {
-      const newState = { ...state };
-
-      newState.chips = { ...state.chips };
-      delete newState.chips[action.payload];
+      delete state.chips[action.payload];
     },
     addConnection: (state, action: PayloadAction<ChipConnection>) => {
       state.connections.push(action.payload);
