@@ -21,6 +21,7 @@ export function App() {
           type: chip.type,
         }))}
         chipId={"motherboard" as ChipId}
+        connections={motherboard.connections}
       />
     </div>
   );

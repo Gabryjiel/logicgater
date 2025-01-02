@@ -1,5 +1,11 @@
 import { useState } from "react";
-import type { ChipId, ChipPosition, ProcessorChip, ProcessorSubchip } from ".";
+import type {
+  ChipConnection,
+  ChipId,
+  ChipPosition,
+  ProcessorChip,
+  ProcessorSubchip,
+} from ".";
 import { useBoolean } from "../lib/useBoolean";
 import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
 import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
@@ -27,7 +33,11 @@ export function Processor(props: { chipId: ChipId }) {
         title={`${chip.type}\n${chip.name}`}
       />
       {boardOpenBool.value ? (
-        <ProcessorBoard chipId={chip.id} chips={chip.chips} />
+        <ProcessorBoard
+          chipId={chip.id}
+          chips={chip.chips}
+          connections={chip.connections}
+        />
       ) : (
         <></>
       )}
@@ -38,6 +48,7 @@ export function Processor(props: { chipId: ChipId }) {
 export function ProcessorBoard(props: {
   chipId: ChipId;
   chips: ProcessorSubchip[];
+  connections: ChipConnection[];
 }) {
   const dispatch = useAppDispatch();
   const isSidebarOpen = useAppSelector(
@@ -120,6 +131,7 @@ export function ProcessorBoard(props: {
       onDrop={handleDrop}
       onDragLeave={handleDragLeave}
       onClick={handleClick}
+      onKeyDown={() => null}
     >
       {isSidebarOpen && props.chipId === lastClickedPosition?.processorId ? (
         <div
@@ -130,6 +142,7 @@ export function ProcessorBoard(props: {
           }}
         />
       ) : null}
+
       {props.chips.map((chip) => {
         switch (chip.type) {
           case "PROCESSOR":
@@ -145,6 +158,12 @@ export function ProcessorBoard(props: {
           default:
             return null;
         }
+      })}
+
+      {props.connections.map((connection) => {
+        return (
+          <div key={connection.input.inputId + connection.output.outputId} />
+        );
       })}
 
       {draggedChip ? (

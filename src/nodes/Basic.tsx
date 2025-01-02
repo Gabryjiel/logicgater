@@ -100,18 +100,13 @@ export function ChipInput(props: {
 }): React.ReactNode {
   const dispatch = useAppDispatch();
 
-  const handleInputDragEnter: React.DragEventHandler<HTMLDivElement> = (
-    event,
-  ) => {
-    if (event.dataTransfer.types.includes(DRAG_TYPES.OUTPUT)) {
-      event.preventDefault();
-    }
-  };
-
   const handleInputDragOver: React.DragEventHandler<HTMLDivElement> = (
     event,
   ) => {
-    if (event.dataTransfer.types.includes(DRAG_TYPES.OUTPUT)) {
+    if (
+      event.dataTransfer.types.includes(DRAG_TYPES.OUTPUT) &&
+      event.dataTransfer.types.includes(DRAG_TYPES.OUTPUT_CHIP)
+    ) {
       event.preventDefault();
     }
   };
@@ -120,7 +115,9 @@ export function ChipInput(props: {
     const outputId = event.dataTransfer.getData(
       DRAG_TYPES.OUTPUT,
     ) as ChipOutputId;
-    const outputChipId = event.dataTransfer.getData(DRAG_TYPES.CHIP) as ChipId;
+    const outputChipId = event.dataTransfer.getData(
+      DRAG_TYPES.OUTPUT_CHIP,
+    ) as ChipId;
     const inputId = event.currentTarget.dataset.inputId as ChipInputId;
     const inputChipId = event.currentTarget.dataset.chipId as ChipId;
 
@@ -145,7 +142,6 @@ export function ChipInput(props: {
       data-chip-id={props.chipId}
       data-input-id={props.inputId}
       className="chip-input"
-      onDragEnter={handleInputDragEnter}
       onDragOver={handleInputDragOver}
       onDrop={handleInputDrop}
       title={props.inputId}
@@ -167,6 +163,7 @@ export function ChipOutput(props: {
     }
 
     event.dataTransfer.setData(DRAG_TYPES.OUTPUT, outputId);
+    event.dataTransfer.setData(DRAG_TYPES.OUTPUT_CHIP, props.chipId);
     event.dataTransfer.effectAllowed = "link";
   };
 
