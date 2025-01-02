@@ -86,6 +86,10 @@ export function ProcessorBoard(props: {
 
     const chipId = event.dataTransfer.getData(DRAG_TYPES.CHIP);
 
+    if (chipId === "") {
+      return;
+    }
+
     dispatch(
       Actions.moveChip({
         chipId: chipId as ChipId,
