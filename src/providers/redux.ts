@@ -37,6 +37,13 @@ export const motherboardSlice = createSlice({
         state.connections[previousConnectionIndex] = action.payload;
       }
     },
+    removeConnection: (state, actions: PayloadAction<ChipConnection>) => {
+      const connections = state.connections.filter(
+        (connection) =>
+          connection.input.inputId !== actions.payload.input.inputId,
+      );
+      return { ...state, connections };
+    },
     moveChip: (
       state,
       action: PayloadAction<ChipPosition & { chipId: ChipId }>,

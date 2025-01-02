@@ -73,7 +73,7 @@ export function ProcessorBoard(props: {
   const handleDragOver: React.DragEventHandler<HTMLDivElement> = (event) => {
     if (event.dataTransfer.types.includes(DRAG_TYPES.CHIP)) {
       event.preventDefault();
-      setDraggedChip(props.chips[0].chipId);
+      setDraggedChip(props.chips[0]?.chipId ?? null);
       setDraggedChipPosition(() => ({
         x: calculateChipPositionFromBrowser(event.pageX),
         y: calculateChipPositionFromBrowser(event.pageY),
@@ -189,11 +189,13 @@ export function ProcessorBoard(props: {
 }
 
 export function Connection(props: { connection: ChipConnection }) {
+  const dispatch = useAppDispatch();
   const pos1 = useAppSelector(
-    (state) => state.motherboard.chips[props.connection.output.chipId].position,
+    (state) =>
+      state.motherboard.chips[props.connection.output.chipId]?.position,
   );
   const pos2 = useAppSelector(
-    (state) => state.motherboard.chips[props.connection.input.chipId].position,
+    (state) => state.motherboard.chips[props.connection.input.chipId]?.position,
   );
   const [_, setState] = useState(0);
 
@@ -215,20 +217,27 @@ export function Connection(props: { connection: ChipConnection }) {
   const properties = calculateConnectionCoordinates(
     outputRef.current,
     inputRef.current,
-    3,
+    5,
   );
+
+  const handleAuxClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (event.button === 1) {
+      dispatch(Actions.removeConnection(props.connection));
+    }
+  };
 
   return (
     <div
       className="chip-connection"
       style={{
-        height: `${3}px`,
+        height: `${5}px`,
         width: `${properties.distance}px`,
         left: `${properties.centerX}px`,
         top: `${properties.centerY}px`,
         transform: `rotate(${properties.angle}deg)`,
       }}
       title={`Connection beetween ${props.connection.output.outputId} and ${props.connection.input.inputId}`}
+      onAuxClick={handleAuxClick}
     />
   );
 }
