@@ -24,6 +24,12 @@ export const motherboardSlice = createSlice({
     },
     removeChip: (state, action: PayloadAction<ChipId>) => {
       delete state.chips[action.payload];
+
+      state.connections = state.connections.filter(
+        (connection) =>
+          connection.input.chipId !== action.payload &&
+          connection.output.chipId !== action.payload,
+      );
     },
     addConnection: (state, action: PayloadAction<ChipConnection>) => {
       const previousConnectionIndex = state.connections.findIndex(
@@ -48,12 +54,14 @@ export const motherboardSlice = createSlice({
       state,
       action: PayloadAction<ChipPosition & { chipId: ChipId }>,
     ) => {
-      if (state.chips[action.payload.chipId] === undefined) {
+      const chip = state.chips[action.payload.chipId];
+
+      if (chip === undefined) {
         return;
       }
 
-      state.chips[action.payload.chipId].position.x = action.payload.x;
-      state.chips[action.payload.chipId].position.y = action.payload.y;
+      chip.position.x = action.payload.x;
+      chip.position.y = action.payload.y;
     },
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen;

@@ -17,12 +17,19 @@ export function BasicChip(props: {
   type: ChipType;
   title: string;
 }): React.ReactNode {
+  const dispatch = useAppDispatch();
   const handleDragStart: React.DragEventHandler<HTMLDivElement> = (event) => {
     event.dataTransfer.setData(DRAG_TYPES.CHIP, props.chipId);
     event.dataTransfer.effectAllowed = "move";
   };
 
   const chipImage = useMemo(() => getChipImage(props.type), [props.type]);
+
+  const handleAuxClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    if (event.button === 1) {
+      dispatch(Actions.removeChip(props.chipId));
+    }
+  };
 
   return (
     <div
@@ -31,6 +38,7 @@ export function BasicChip(props: {
         left: `${props.position.x * PIXELS_PER_CHIP}px`,
         top: `${props.position.y * PIXELS_PER_CHIP}px`,
       }}
+      onAuxClick={handleAuxClick}
       title={props.title}
     >
       <div className="chip" draggable="true" onDragStart={handleDragStart}>
