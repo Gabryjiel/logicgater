@@ -12,6 +12,7 @@ export function AndGateChip(props: { chipId: ChipId }) {
       position={data.position}
       type="AND_GATE"
       outputs={data.outputs}
+      title={`${data.name} (And Gate)`}
     />
   );
 }
