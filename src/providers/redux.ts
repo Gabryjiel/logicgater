@@ -26,20 +26,25 @@ export const motherboardSlice = createSlice({
       delete state.chips[action.payload];
     },
     addConnection: (state, action: PayloadAction<ChipConnection>) => {
-      const alreadyExists = state.connections.some(
+      const previousConnectionIndex = state.connections.findIndex(
         (connection) =>
-          connection.output.outputId === action.payload.output.outputId &&
           connection.input.inputId === action.payload.input.inputId,
       );
 
-      if (!alreadyExists) {
+      if (previousConnectionIndex === -1) {
         state.connections.push(action.payload);
+      } else {
+        state.connections[previousConnectionIndex] = action.payload;
       }
     },
     moveChip: (
       state,
       action: PayloadAction<ChipPosition & { chipId: ChipId }>,
     ) => {
+      if (state.chips[action.payload.chipId] === undefined) {
+        return;
+      }
+
       state.chips[action.payload.chipId].position.x = action.payload.x;
       state.chips[action.payload.chipId].position.y = action.payload.y;
     },
