@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   ChipConnection,
   ChipId,
@@ -162,7 +162,10 @@ export function ProcessorBoard(props: {
 
       {props.connections.map((connection) => {
         return (
-          <div key={connection.input.inputId + connection.output.outputId} />
+          <Connection
+            key={connection.output.outputId + connection.input.inputId}
+            connection={connection}
+          />
         );
       })}
 
@@ -179,4 +182,96 @@ export function ProcessorBoard(props: {
       )}
     </div>
   );
+}
+
+export function Connection(props: { connection: ChipConnection }) {
+  const pos1 = useAppSelector(
+    (state) => state.motherboard.chips[props.connection.output.chipId].position,
+  );
+  const pos2 = useAppSelector(
+    (state) => state.motherboard.chips[props.connection.input.chipId].position,
+  );
+  const [_, setState] = useState(0);
+
+  const outputRef = useRef(
+    document.getElementById(props.connection.output.outputId),
+  );
+  const inputRef = useRef(
+    document.getElementById(props.connection.input.inputId),
+  );
+
+  useEffect(() => {
+    setState((prev) => prev + 1);
+  }, [pos1, pos2]);
+
+  if (outputRef.current === null || inputRef.current === null) {
+    return null;
+  }
+
+  const properties = calculateConnectionCoordinates(
+    outputRef.current,
+    inputRef.current,
+    3,
+  );
+
+  return (
+    <div
+      className="chip-connection"
+      style={{
+        height: `${3}px`,
+        width: `${properties.distance}px`,
+        left: `${properties.centerX}px`,
+        top: `${properties.centerY}px`,
+        transform: `rotate(${properties.angle}deg)`,
+      }}
+    />
+  );
+}
+
+// Via https://stackoverflow.com/questions/8672369/how-to-draw-a-line-between-two-divs#answer-8673281
+
+type Offset = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+function getOffset(element: HTMLElement): Offset {
+  const rect = element.getBoundingClientRect();
+
+  return {
+    left: rect.left + window.scrollX,
+    top: rect.top + window.scrollY,
+    width: rect.width || element.offsetWidth,
+    height: rect.height || element.offsetHeight,
+  };
+}
+
+function calculateConnectionCoordinates(
+  outputElement: HTMLElement,
+  inputElement: HTMLElement,
+  thickness: number,
+) {
+  const outputOffset = getOffset(outputElement);
+  const inputOffset = getOffset(inputElement);
+
+  const x1 = outputOffset.left + outputOffset.width / 2;
+  const y1 = outputOffset.top + outputOffset.height / 2;
+
+  const x2 = inputOffset.left + inputOffset.width / 2;
+  const y2 = inputOffset.top + inputOffset.height / 2;
+
+  const distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+  const centerX = (x1 + x2) / 2 - distance / 2;
+  const centerY = (y1 + y2) / 2 - thickness / 2;
+
+  const angle = Math.atan2(y1 - y2, x1 - x2) * (180 / Math.PI);
+
+  return {
+    centerX,
+    centerY,
+    distance,
+    angle,
+  };
 }

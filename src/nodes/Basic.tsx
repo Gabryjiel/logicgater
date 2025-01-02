@@ -139,6 +139,7 @@ export function ChipInput(props: {
 
   return (
     <div
+      id={props.inputId}
       data-chip-id={props.chipId}
       data-input-id={props.inputId}
       className="chip-input"
@@ -169,7 +170,7 @@ export function ChipOutput(props: {
 
   return (
     <div
-      key={props.outputId}
+      id={props.outputId}
       data-chip-id={props.chipId}
       data-output-id={props.outputId}
       className="chip-output"
