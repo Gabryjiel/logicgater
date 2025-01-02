@@ -228,6 +228,7 @@ export function Connection(props: { connection: ChipConnection }) {
         top: `${properties.centerY}px`,
         transform: `rotate(${properties.angle}deg)`,
       }}
+      title={`Connection beetween ${props.connection.output.outputId} and ${props.connection.input.inputId}`}
     />
   );
 }
