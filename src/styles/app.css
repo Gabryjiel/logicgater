@@ -6,6 +6,10 @@
 
 :root {
   --pixels-per-chip: 50px;
+  --z-index-connection: 2;
+  --z-index-input: 3;
+  --z-index-output: 3;
+  --z-index-chip: 4;
 }
 
 .container {
@@ -63,6 +67,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: var(--z-index-chip);
+  position: relative;
 }
 
 .chip-outline {
@@ -95,6 +101,7 @@
   width: 7px;
   height: 7px;
   background-color: yellow;
+  z-index: var(--z-index-input);
 }
 
 .chip-right-outputs {
@@ -111,6 +118,7 @@
   width: 10px;
   height: 10px;
   background-color: yellowgreen;
+  z-index: var(--z-index-output);
 }
 
 .chip-output:hover {
@@ -137,7 +145,8 @@
 }
 
 .chip-connection {
-  background-color: red;
+  background-color: blue;
   line-height: 1px;
   position: absolute;
+  z-index: var(--z-index-connection);
 }
