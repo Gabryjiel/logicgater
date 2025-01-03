@@ -6,15 +6,15 @@ import type {
   ProcessorChip,
   ProcessorSubchip,
 } from ".";
-import { useBoolean } from "../lib/useBoolean";
-import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
-import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
-import { BatteryChip } from "./Battery";
-import { AndGateChip } from "./AndGate";
-import { TimerChip } from "./Timer";
-import { LightChip } from "./Light";
+import { useBoolean } from "../lib/useBoolean";
+import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
+import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
+import { AndGate } from "./AndGate";
 import { BasicChip } from "./Basic";
+import { BatteryChip } from "./Battery";
+import { Light } from "./Light";
+import { Timer } from "./Timer";
 
 export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
@@ -154,11 +154,11 @@ export function ProcessorBoard(props: {
           case "BATTERY":
             return <BatteryChip key={chip.chipId} chipId={chip.chipId} />;
           case "AND_GATE":
-            return <AndGateChip key={chip.chipId} chipId={chip.chipId} />;
+            return <AndGate key={chip.chipId} chipId={chip.chipId} />;
           case "TIMER":
-            return <TimerChip key={chip.chipId} chipId={chip.chipId} />;
+            return <Timer key={chip.chipId} chipId={chip.chipId} />;
           case "LIGHT":
-            return <LightChip key={chip.chipId} chipId={chip.chipId} />;
+            return <Light key={chip.chipId} chipId={chip.chipId} />;
           default:
             return null;
         }

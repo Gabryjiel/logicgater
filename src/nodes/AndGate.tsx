@@ -1,9 +1,11 @@
-import type { ChipId } from ".";
+import type { AndGateChip, ChipId } from ".";
 import { useAppSelector } from "../providers/redux";
 import { BasicChip } from "./Basic";
 
-export function AndGateChip(props: { chipId: ChipId }) {
-  const data = useAppSelector((state) => state.motherboard.chips[props.chipId]);
+export function AndGate(props: { chipId: ChipId }) {
+  const data = useAppSelector(
+    (state) => state.motherboard.chips[props.chipId],
+  ) as AndGateChip;
 
   return (
     <BasicChip

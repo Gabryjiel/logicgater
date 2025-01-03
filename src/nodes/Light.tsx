@@ -1,9 +1,11 @@
-import type { ChipId } from ".";
+import type { ChipId, LightChip } from ".";
 import { useAppSelector } from "../providers/redux";
 import { BasicChip } from "./Basic";
 
-export function LightChip(props: { chipId: ChipId }) {
-  const data = useAppSelector((state) => state.motherboard.chips[props.chipId]);
+export function Light(props: { chipId: ChipId }) {
+  const data = useAppSelector(
+    (state) => state.motherboard.chips[props.chipId],
+  ) as LightChip;
 
   return (
     <BasicChip
@@ -12,6 +14,16 @@ export function LightChip(props: { chipId: ChipId }) {
       outputs={data.outputs}
       type="LIGHT"
       position={data.position}
-    />
+      title={`${data.name} (LIGHT)\n${data.value} [LM]`}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          backgroundColor: "blue",
+          filter: `brightness(${data.value / 100})`,
+        }}
+      />
+    </BasicChip>
   );
 }

@@ -15,7 +15,11 @@ export type ChipInputId = Branded<string, "ChipInput">;
 export type ChipOutputId = Branded<string, "ChipOutput">;
 export type ChipInputPlacement = "LEFT" | "BOTTOM";
 export type ChipInput = { inputId: ChipInputId; placement: ChipInputPlacement };
-export type ChipOutput = { outputId: ChipOutputId; placement: "RIGHT" };
+export type ChipOutput = {
+  outputId: ChipOutputId;
+  placement: "RIGHT";
+  value: number;
+};
 
 export type ChipConnection = {
   input: { chipId: ChipId; inputId: ChipInputId };
@@ -44,18 +48,21 @@ export type ProcessorChip = BasicChip & {
 export type BatteryChip = BasicChip & {
   type: "BATTERY";
   power: number;
+  outputs: [ChipOutput];
 };
 
-type AndGateChip = BasicChip & {
+export type AndGateChip = BasicChip & {
   type: "AND_GATE";
+  outputs: [ChipOutput];
 };
 
-type TimerChip = BasicChip & {
+export type TimerChip = BasicChip & {
   type: "TIMER";
   durationMs: number;
 };
 
 export type LightChip = BasicChip & {
+  value: number;
   type: "LIGHT";
 };
 
@@ -76,10 +83,11 @@ export const chipFactory = {
       inputs: [],
     };
   },
-  createOutput(chipId: ChipId, num: number): ChipOutput {
+  createOutput(chipId: ChipId, num: number, value?: number): ChipOutput {
     return {
       outputId: `${chipId}_OUTPUT_${num}` as ChipOutputId,
       placement: "RIGHT",
+      value: value ?? 0,
     };
   },
   createInput(
@@ -111,7 +119,7 @@ export const chipFactory = {
       name: `Battery ${chipCounter}`,
       type: "BATTERY",
       power: config?.power ?? 100,
-      outputs: [this.createOutput(basicChip.id, 1)],
+      outputs: [this.createOutput(basicChip.id, 1, config?.power ?? 100)],
     };
   },
   createAndGate(config?: { position?: ChipPosition }): AndGateChip {
@@ -151,6 +159,7 @@ export const chipFactory = {
       ...basicChip,
       type: "LIGHT",
       inputs: [this.createInput(basicChip.id, 1, "LEFT")],
+      value: 0,
     };
   },
   create(chipType: string, config?: { position: ChipPosition }): AnyChip {

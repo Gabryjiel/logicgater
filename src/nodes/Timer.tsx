@@ -1,9 +1,11 @@
-import type { ChipId } from ".";
+import type { ChipId, TimerChip } from ".";
 import { useAppSelector } from "../providers/redux";
 import { BasicChip } from "./Basic";
 
-export function TimerChip(props: { chipId: ChipId }) {
-  const data = useAppSelector((state) => state.motherboard.chips[props.chipId]);
+export function Timer(props: { chipId: ChipId }) {
+  const data = useAppSelector(
+    (state) => state.motherboard.chips[props.chipId],
+  ) as TimerChip;
 
   return (
     <BasicChip
@@ -12,6 +14,7 @@ export function TimerChip(props: { chipId: ChipId }) {
       outputs={data.outputs}
       position={data.position}
       type="TIMER"
+      title={`${data.name} (TIMER)`}
     />
   );
 }

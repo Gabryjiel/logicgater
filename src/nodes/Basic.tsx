@@ -11,6 +11,7 @@ import { Actions, useAppDispatch } from "../providers/redux";
 
 export function BasicChip(props: {
   chipId: ChipId;
+  children?: React.ReactNode;
   inputs: { inputId: ChipInputId; placement: "LEFT" | "BOTTOM" }[];
   outputs: { outputId: ChipOutputId; placement: "RIGHT" }[];
   position: ChipPosition;
@@ -42,7 +43,7 @@ export function BasicChip(props: {
       title={props.title}
     >
       <div className="chip" draggable="true" onDragStart={handleDragStart}>
-        {chipImage}
+        {props.children ?? chipImage}
       </div>
       <div className="chip-left-inputs">
         {props.inputs
