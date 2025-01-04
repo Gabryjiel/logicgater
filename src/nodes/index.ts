@@ -123,6 +123,7 @@ export const chipFactory = {
       ...basicChip,
       name: `Battery ${chipCounter}`,
       type: "BATTERY",
+      inputs: [],
       value: config?.power ?? 100,
       outputs: [this.createOutput(basicChip.id, 1, config?.power ?? 100)],
     };
@@ -163,6 +164,7 @@ export const chipFactory = {
     return {
       ...basicChip,
       type: "LIGHT",
+      outputs: [],
       inputs: [this.createInput(basicChip.id, 1, "LEFT")],
       value: 0,
     };
