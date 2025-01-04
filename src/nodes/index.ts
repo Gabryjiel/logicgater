@@ -47,8 +47,9 @@ export type ProcessorChip = BasicChip & {
 
 export type BatteryChip = BasicChip & {
   type: "BATTERY";
-  power: number;
+  value: number;
   outputs: [ChipOutput];
+  inputs: [];
 };
 
 export type AndGateChip = BasicChip & {
@@ -59,11 +60,15 @@ export type AndGateChip = BasicChip & {
 export type TimerChip = BasicChip & {
   type: "TIMER";
   durationMs: number;
+  inputs: [ChipInput, ChipInput];
+  outputs: [ChipOutput];
 };
 
 export type LightChip = BasicChip & {
   value: number;
   type: "LIGHT";
+  outputs: [];
+  inputs: [ChipInput];
 };
 
 let chipCounter = 0;
@@ -118,7 +123,7 @@ export const chipFactory = {
       ...basicChip,
       name: `Battery ${chipCounter}`,
       type: "BATTERY",
-      power: config?.power ?? 100,
+      value: config?.power ?? 100,
       outputs: [this.createOutput(basicChip.id, 1, config?.power ?? 100)],
     };
   },

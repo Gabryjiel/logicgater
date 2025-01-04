@@ -148,7 +148,7 @@ abstract class RxBaseChip {
 export class RxChipBattery extends RxBaseChip {
   onChipChange(chip: AnyChip): void {
     if (chip.type === "BATTERY") {
-      this.outputs[0]?.setNextValue(chip.power);
+      this.outputs[0]?.setNextValue(chip.value);
     }
   }
 }

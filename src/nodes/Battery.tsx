@@ -14,7 +14,7 @@ export function BatteryChip(props: { chipId: ChipId }) {
       inputs={data.inputs}
       position={data.position}
       outputs={data.outputs}
-      title={`${data.name} (${data.type}) \n${data.power} [MJ]`}
+      title={`${data.name} (${data.type}) \n${data.value} [MJ]`}
     />
   );
 }
