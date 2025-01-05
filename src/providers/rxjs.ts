@@ -96,6 +96,10 @@ class ChipInternalMap {
 }
 
 export const RxMap = new ChipInternalMap();
+
+declare const window: {
+  rxmap: ChipInternalMap;
+} & Window;
 window.rxmap = RxMap;
 
 /**
