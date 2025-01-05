@@ -5,7 +5,13 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import type { AnyChip, ChipId, ChipConnection, ChipPosition } from "../nodes";
+import type {
+  AnyChip,
+  ChipId,
+  ChipConnection,
+  ChipPosition,
+  ChipType,
+} from "../nodes";
 import { RxMap } from "./rxjs";
 
 type ClickPosition = { processorId: ChipId } & ChipPosition;
@@ -104,7 +110,7 @@ const undoSlice = createSlice({
   },
 });
 
-export type SidebarType = "CLOSED" | "CHIPS" | "BATTERY_CHIP";
+export type SidebarType = "CLOSED" | "CHIPS" | ChipType;
 
 const sidebarSlice = createSlice({
   name: "sidebar",

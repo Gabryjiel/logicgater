@@ -1,0 +1,31 @@
+.sidebar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 5px;
+  border-bottom: 1px solid white;
+  position: relative;
+
+  #close-sidebar-button {
+    background: transparent;
+    color: lightcoral;
+    padding: 0;
+    font-weight: bolder;
+    font-size: 20px;
+    border: 2px solid lightcoral;
+    border-radius: 100%;
+    width: 25px;
+    height: 25px;
+    font-family: monospace;
+    position: absolute;
+    right: 10px;
+    transition: color 0.2s;
+    transition: border-color 0.2s;
+
+    &:hover {
+      color: red;
+      border-color: red;
+    }
+  }
+}

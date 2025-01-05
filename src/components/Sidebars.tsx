@@ -1,6 +1,12 @@
-import { useAppSelector } from "../providers/redux";
+import {
+  SidebarActions,
+  useAppDispatch,
+  useAppSelector,
+} from "../providers/redux";
 import { SidebarBattery } from "./SidebarBattery";
 import { SidebarChips } from "./SidebarChips";
+
+import "./sidebars.css";
 
 export function Sidebars() {
   const sidebarType = useAppSelector((state) => state.sidebar.value);
@@ -12,7 +18,7 @@ export function Sidebars() {
   return (
     <SidebarContainer>
       {sidebarType === "CHIPS" && <SidebarChips />}
-      {sidebarType === "BATTERY_CHIP" && <SidebarBattery />}
+      {sidebarType === "BATTERY" && <SidebarBattery />}
     </SidebarContainer>
   );
 }
@@ -23,4 +29,22 @@ export function SidebarContainer(props: { children: React.ReactNode }) {
 
 export function SidebarGroup(props: { children: React.ReactNode }) {
   return <div className="sidebar-group">{props.children}</div>;
+}
+
+export function SidebarHeader(props: { title: string }) {
+  const dispatch = useAppDispatch();
+
+  const onCloseClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.preventDefault();
+    dispatch(SidebarActions.close());
+  };
+
+  return (
+    <div className="sidebar-header">
+      <h3>{props.title}</h3>
+      <button id="close-sidebar-button" onClick={onCloseClick} type="button">
+        X
+      </button>
+    </div>
+  );
 }

@@ -10,6 +10,7 @@
   --z-index-input: 3;
   --z-index-output: 3;
   --z-index-chip: 4;
+  --z-index-lastclicked: 5;
 }
 
 .container {
@@ -127,6 +128,7 @@
 }
 
 .last-clicked-position {
+  z-index: var(--z-index-lastclicked);
   width: var(--pixels-per-chip);
   height: var(--pixels-per-chip);
   position: absolute;

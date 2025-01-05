@@ -7,14 +7,13 @@ import type {
   ChipPosition,
   ChipType,
 } from "../nodes";
-import { Actions, useAppDispatch } from "../providers/redux";
+import { Actions, SidebarActions, useAppDispatch } from "../providers/redux";
 
 export function BasicChip(props: {
   chipId: ChipId;
   children?: React.ReactNode;
   inputs: { inputId: ChipInputId; placement: "LEFT" | "BOTTOM" }[];
   outputs: { outputId: ChipOutputId; placement: "RIGHT" }[];
-  onClick: React.MouseEventHandler<HTMLDivElement>;
   position: ChipPosition;
   type: ChipType;
   title: string;
@@ -33,6 +32,12 @@ export function BasicChip(props: {
     }
   };
 
+  const handleOnClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault();
+
+    dispatch(SidebarActions.toggle(props.type));
+  };
+
   return (
     <div
       className="chip-container"
@@ -40,7 +45,7 @@ export function BasicChip(props: {
         left: `${props.position.x * PIXELS_PER_CHIP}px`,
         top: `${props.position.y * PIXELS_PER_CHIP}px`,
       }}
-      onClick={props.onClick}
+      onClick={handleOnClick}
       onAuxClick={handleAuxClick}
       title={props.title}
     >

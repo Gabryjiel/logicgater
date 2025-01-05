@@ -1,6 +1,6 @@
 import { type ChipType, chipFactory } from "../nodes";
 import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
-import { SidebarGroup } from "./Sidebars";
+import { SidebarGroup, SidebarHeader } from "./Sidebars";
 
 export function SidebarChips() {
   const dispatch = useAppDispatch();
@@ -27,6 +27,7 @@ export function SidebarChips() {
 
   return (
     <>
+      <SidebarHeader title="Chips" />
       <SidebarGroup>
         <SidebarElement
           chipType="BATTERY"

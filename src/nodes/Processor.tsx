@@ -109,12 +109,14 @@ export function ProcessorBoard(props: {
 
   const handleClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
+    const element = event.target as HTMLElement;
 
     if (
-      (event.target as HTMLDivElement)?.classList.contains("processor-board")
+      element.classList.contains("processor-board") ||
+      element.classList.contains("chip")
     ) {
       if (sidebarType === "CLOSED") {
-        dispatch(SidebarActions.toggle("CHIPS"));
+        dispatch(SidebarActions.setSidebar("CHIPS"));
       }
 
       dispatch(
@@ -124,8 +126,7 @@ export function ProcessorBoard(props: {
           processorId: props.chipId,
         }),
       );
-    } else if (sidebarType === "CLOSED") {
-      dispatch(SidebarActions.toggle("CHIPS"));
+    } else if (element.classList.contains("last-clicked-position")) {
       dispatch(Actions.updateLastClickedPosition(null));
     }
   };
