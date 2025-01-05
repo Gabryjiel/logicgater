@@ -1,7 +1,6 @@
 import {
   BehaviorSubject,
   type Observer,
-  type Subject,
   Subscription,
   combineLatest,
   map,
@@ -18,9 +17,6 @@ import type {
   ChipOutputId,
 } from "../nodes";
 import { Actions, store } from "./redux";
-
-export const subjectMap = new Map<string, Subject<number>>();
-export const subscriberMap = new Map<string, Observer<number>>();
 
 class ChipInternalMap {
   #chipMap: Map<ChipId, RxBaseChip>;
@@ -66,6 +62,8 @@ class ChipInternalMap {
       throw new Error(`Chip with id ${chipId} does not exist!`);
     }
 
+    const chip = this.getChipById(chipId);
+    chip.unregister();
     this.#chipMap.delete(chipId);
     console.debug(`Chip with id ${chipId} removed`);
   }
@@ -102,17 +100,6 @@ declare const window: {
 } & Window;
 window.rxmap = RxMap;
 
-/**
- * Output => Subject
- * Input => Subscriber
- *
- * Output = Input[] + Internal
- *
- * Internal:
- * - [X] Redux Store
- * -
- */
-
 abstract class RxBaseChip {
   readonly chipId: ChipId;
   outputs: RxChipOutput[];
@@ -147,6 +134,9 @@ abstract class RxBaseChip {
 
   onChipChange?(chip: AnyChip): void;
   register?(): Subscription;
+  unregister() {
+    this.subscription.unsubscribe();
+  }
 }
 
 export class RxChipBattery extends RxBaseChip {
