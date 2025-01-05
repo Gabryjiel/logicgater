@@ -1,7 +1,8 @@
 import { type ChipType, chipFactory } from "../nodes";
 import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
+import { SidebarGroup } from "./Sidebars";
 
-export function Sidebar(props: { isOpen: boolean }) {
+export function SidebarChips() {
   const dispatch = useAppDispatch();
   const lastClickedPosition = useAppSelector(
     (state) => state.motherboard.lastClickedPosition,
@@ -24,9 +25,9 @@ export function Sidebar(props: { isOpen: boolean }) {
     }
   };
 
-  return props.isOpen ? (
-    <aside id="sidebar">
-      <div className="sidebar-group">
+  return (
+    <>
+      <SidebarGroup>
         <SidebarElement
           chipType="BATTERY"
           name="Battery"
@@ -52,10 +53,8 @@ export function Sidebar(props: { isOpen: boolean }) {
           name="Timer"
           onClick={handleSidebarElementClick}
         />
-      </div>
-    </aside>
-  ) : (
-    <></>
+      </SidebarGroup>
+    </>
   );
 }
 

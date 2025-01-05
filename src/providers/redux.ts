@@ -13,7 +13,6 @@ type ClickPosition = { processorId: ChipId } & ChipPosition;
 const initialState = {
   chips: {} as Record<ChipId, AnyChip>,
   connections: new Array<ChipConnection>(),
-  isSidebarOpen: false,
   lastClickedPosition: null as ClickPosition | null,
 };
 
@@ -62,11 +61,27 @@ export const motherboardSlice = createSlice({
         chip.position.y = action.payload.y;
       }
     },
-    changeChip: (state, action: PayloadAction<AnyChip>) => {
-      state.chips[action.payload.id] = action.payload;
+    changeChip: (
+      state,
+      action: PayloadAction<Partial<AnyChip> & { id: ChipId }>,
+    ) => {
+      const chip = state.chips[action.payload.id];
+
+      if (chip) {
+        if (chip.type === "BATTERY" && action.payload.type === "BATTERY") {
+          chip.value = action.payload.value ?? chip.value;
+        }
+      }
     },
-    toggleSidebar: (state) => {
-      state.isSidebarOpen = !state.isSidebarOpen;
+    changeChipName: (
+      state,
+      action: PayloadAction<{ chipId: ChipId; name: string }>,
+    ) => {
+      const chip = state.chips[action.payload.chipId];
+
+      if (chip) {
+        chip.name = action.payload.name;
+      }
     },
     updateLastClickedPosition: (
       state,
@@ -85,6 +100,30 @@ const undoSlice = createSlice({
   reducers: {
     addStep: (state, action: PayloadAction<UndoAction>) => {
       return state.concat(action.payload);
+    },
+  },
+});
+
+export type SidebarType = "CLOSED" | "CHIPS" | "BATTERY_CHIP";
+
+const sidebarSlice = createSlice({
+  name: "sidebar",
+  initialState: {
+    value: "CLOSED" as SidebarType,
+  },
+  reducers: {
+    close: (state) => {
+      state.value = "CLOSED";
+    },
+    setSidebar: (state, action: PayloadAction<SidebarType>) => {
+      state.value = action.payload;
+    },
+    toggle: (state, action: PayloadAction<SidebarType>) => {
+      if (state.value === action.payload) {
+        state.value = "CLOSED";
+      } else {
+        state.value = action.payload;
+      }
     },
   },
 });
@@ -144,6 +183,7 @@ export const store = configureStore({
   reducer: {
     motherboard: motherboardSlice.reducer,
     undo: undoSlice.reducer,
+    sidebar: sidebarSlice.reducer,
   },
   devTools: true,
   middleware: (getDefaultMiddleware) =>
@@ -157,3 +197,4 @@ export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
 
 export const Actions = motherboardSlice.actions;
+export const SidebarActions = sidebarSlice.actions;

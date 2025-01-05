@@ -14,6 +14,7 @@ export function BasicChip(props: {
   children?: React.ReactNode;
   inputs: { inputId: ChipInputId; placement: "LEFT" | "BOTTOM" }[];
   outputs: { outputId: ChipOutputId; placement: "RIGHT" }[];
+  onClick: React.MouseEventHandler<HTMLDivElement>;
   position: ChipPosition;
   type: ChipType;
   title: string;
@@ -39,6 +40,7 @@ export function BasicChip(props: {
         left: `${props.position.x * PIXELS_PER_CHIP}px`,
         top: `${props.position.y * PIXELS_PER_CHIP}px`,
       }}
+      onClick={props.onClick}
       onAuxClick={handleAuxClick}
       title={props.title}
     >

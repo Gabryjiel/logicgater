@@ -9,7 +9,12 @@ import type {
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
 import { useBoolean } from "../lib/useBoolean";
 import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
-import { Actions, useAppDispatch, useAppSelector } from "../providers/redux";
+import {
+  Actions,
+  SidebarActions,
+  useAppDispatch,
+  useAppSelector,
+} from "../providers/redux";
 import { AndGate } from "./AndGate";
 import { BasicChip } from "./Basic";
 import { BatteryChip } from "./Battery";
@@ -51,9 +56,7 @@ export function ProcessorBoard(props: {
   connections: ChipConnection[];
 }) {
   const dispatch = useAppDispatch();
-  const isSidebarOpen = useAppSelector(
-    (state) => state.motherboard.isSidebarOpen,
-  );
+  const sidebarType = useAppSelector((state) => state.sidebar.value);
   const lastClickedPosition = useAppSelector(
     (state) => state.motherboard.lastClickedPosition,
   );
@@ -110,8 +113,8 @@ export function ProcessorBoard(props: {
     if (
       (event.target as HTMLDivElement)?.classList.contains("processor-board")
     ) {
-      if (!isSidebarOpen) {
-        dispatch(Actions.toggleSidebar());
+      if (sidebarType === "CLOSED") {
+        dispatch(SidebarActions.toggle("CHIPS"));
       }
 
       dispatch(
@@ -121,8 +124,8 @@ export function ProcessorBoard(props: {
           processorId: props.chipId,
         }),
       );
-    } else if (isSidebarOpen) {
-      dispatch(Actions.toggleSidebar());
+    } else if (sidebarType === "CLOSED") {
+      dispatch(SidebarActions.toggle("CHIPS"));
       dispatch(Actions.updateLastClickedPosition(null));
     }
   };
@@ -137,7 +140,7 @@ export function ProcessorBoard(props: {
       onClick={handleClick}
       onKeyDown={() => null}
     >
-      {isSidebarOpen && props.chipId === lastClickedPosition?.processorId ? (
+      {props.chipId === lastClickedPosition?.processorId ? (
         <div
           className="last-clicked-position"
           style={{
@@ -191,11 +194,10 @@ export function ProcessorBoard(props: {
 export function Connection(props: { connection: ChipConnection }) {
   const dispatch = useAppDispatch();
   const pos1 = useAppSelector(
-    (state) =>
-      state.motherboard.chips[props.connection.output.chipId]?.position,
+    (state) => state.motherboard.chips[props.connection.output.chipId],
   );
   const pos2 = useAppSelector(
-    (state) => state.motherboard.chips[props.connection.input.chipId]?.position,
+    (state) => state.motherboard.chips[props.connection.input.chipId],
   );
   const [_, setState] = useState(0);
 
