@@ -45,7 +45,7 @@
   --t: 1px; /* the thickness */
   --g: 4px; /* the gap between dashes */
 
-  --c: black 25%, #0000 0;
+  --c: black 25%, #000000 0;
   background:
     conic-gradient(at var(--g) var(--t), var(--c))
       calc((var(--s) / var(--n) - var(--g) + var(--t)) / 2) 0 /

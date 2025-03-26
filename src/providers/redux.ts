@@ -110,23 +110,20 @@ const undoSlice = createSlice({
   },
 });
 
-export type SidebarType = "CLOSED" | "CHIPS" | ChipType;
+export type SidebarType = "DEFAULT" | "CHIPS" | ChipType;
+
+const sidebarSliceInitialState: { value: SidebarType } = { value: "DEFAULT" };
 
 const sidebarSlice = createSlice({
   name: "sidebar",
-  initialState: {
-    value: "CLOSED" as SidebarType,
-  },
+  initialState: sidebarSliceInitialState,
   reducers: {
-    close: (state) => {
-      state.value = "CLOSED";
-    },
     setSidebar: (state, action: PayloadAction<SidebarType>) => {
       state.value = action.payload;
     },
     toggle: (state, action: PayloadAction<SidebarType>) => {
       if (state.value === action.payload) {
-        state.value = "CLOSED";
+        state.value = "DEFAULT";
       } else {
         state.value = action.payload;
       }

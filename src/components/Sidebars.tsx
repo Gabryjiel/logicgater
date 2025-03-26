@@ -5,6 +5,7 @@ import {
 } from "../providers/redux";
 import { SidebarBattery } from "./SidebarBattery";
 import { SidebarChips } from "./SidebarChips";
+import { IoHome } from "react-icons/io5";
 
 import "./sidebars.css";
 
@@ -42,8 +43,9 @@ export function SidebarHeader(props: { title: string }) {
   return (
     <div className="sidebar-header">
       <h3>{props.title}</h3>
+
       <button id="close-sidebar-button" onClick={onCloseClick} type="button">
-        X
+        <IoHome />
       </button>
     </div>
   );
