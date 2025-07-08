@@ -1,8 +1,8 @@
-import { useAppSelector } from "../providers/redux";
+// import { useAppSelector } from "../providers/redux";
 import { SidebarGroup, SidebarHeader } from "./Sidebars";
 
 export function SidebarBattery() {
-  const battery = useAppSelector((state) => state.motherboard.chips);
+  // const battery = useAppSelector((state) => state.chips);
 
   return (
     <>

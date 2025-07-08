@@ -7,18 +7,20 @@ import type { ChipId } from "./nodes";
 import { Sidebars } from "./components/Sidebars";
 
 export function App() {
-  const motherboard = useAppSelector((state) => state.motherboard);
+  const chips = useAppSelector((state) => Object.values(state.chips).map((chip) => ({
+    chipId: chip.id,
+    type: chip.type,
+  })));
+
+  const connections = useAppSelector((state) => state.connections);
 
   return (
     <div className="container">
       <Sidebars />
       <ProcessorBoard
-        chips={Object.values(motherboard.chips).map((chip) => ({
-          chipId: chip.id,
-          type: chip.type,
-        }))}
+        chips={chips}
         chipId={"motherboard" as ChipId}
-        connections={motherboard.connections}
+        connections={connections}
       />
     </div>
   );

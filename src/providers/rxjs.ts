@@ -16,7 +16,8 @@ import type {
   ChipOutput,
   ChipOutputId,
 } from "../nodes";
-import { Actions, store } from "./redux";
+import { store } from "./redux";
+import { ChipSlice } from "./redux/chips";
 
 class ChipInternalMap {
   #chipMap: Map<ChipId, RxBaseChip>;
@@ -173,7 +174,7 @@ export class RxChipLight extends RxBaseChip {
     );
     console.log("REGISTER");
 
-    const chip = store.getState().motherboard.chips[this.chipId];
+    const chip = store.getState().chips[this.chipId];
     if (chip?.type !== "LIGHT") {
       throw new Error(`Incorrent chip type for ${this.chipId}`);
     }
@@ -181,7 +182,7 @@ export class RxChipLight extends RxBaseChip {
     return combined.subscribe((value) => {
       console.log(`Change (LIGHT) ${this.chipId} ${value}`);
       if (value !== undefined) {
-        store.dispatch(Actions.changeChip({ ...chip, value }));
+        store.dispatch(ChipSlice.actions.changeChip({ ...chip, value }));
       }
     });
   }

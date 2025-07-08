@@ -1,18 +1,15 @@
-import {
-  SidebarActions,
-  useAppDispatch,
-  useAppSelector,
-} from "../providers/redux";
+import { useAppDispatch, useAppSelector } from "../providers/redux";
 import { SidebarBattery } from "./SidebarBattery";
 import { SidebarChips } from "./SidebarChips";
 import { IoHome } from "react-icons/io5";
 
 import "./sidebars.css";
+import { SidebarSlice } from "../providers/redux/sidebar";
 
 export function Sidebars() {
-  const sidebarType = useAppSelector((state) => state.sidebar.value);
+  const sidebarType = useAppSelector((state) => state.sidebar);
 
-  if (sidebarType === "CLOSED") {
+  if (sidebarType === "DEFAULT") {
     return null;
   }
 
@@ -37,7 +34,7 @@ export function SidebarHeader(props: { title: string }) {
 
   const onCloseClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    dispatch(SidebarActions.close());
+    dispatch(SidebarSlice.actions.setSidebar("DEFAULT"));
   };
 
   return (

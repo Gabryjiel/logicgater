@@ -9,22 +9,21 @@ import type {
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
 import { useBoolean } from "../lib/useBoolean";
 import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
-import {
-  Actions,
-  SidebarActions,
-  useAppDispatch,
-  useAppSelector,
-} from "../providers/redux";
+import { useAppDispatch, useAppSelector } from "../providers/redux";
 import { AndGate } from "./AndGate";
 import { BasicChip } from "./Basic";
 import { BatteryChip } from "./Battery";
 import { Light } from "./Light";
 import { Timer } from "./Timer";
+import { ChipSlice } from "../providers/redux/chips";
+import { UtilsSlice } from "../providers/redux/utils";
+import { ConnectionSlice } from "../providers/redux/connections";
+import { SidebarSlice } from "../providers/redux/sidebar";
 
 export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
   const chip = useAppSelector(
-    (state) => state.motherboard.chips[props.chipId] as ProcessorChip,
+    (state) => state.chips[props.chipId] as ProcessorChip,
   );
 
   return (
@@ -56,10 +55,8 @@ export function ProcessorBoard(props: {
   connections: ChipConnection[];
 }) {
   const dispatch = useAppDispatch();
-  const sidebarType = useAppSelector((state) => state.sidebar.value);
-  const lastClickedPosition = useAppSelector(
-    (state) => state.motherboard.lastClickedPosition,
-  );
+  const sidebarType = useAppSelector((state) => state.sidebar);
+  const lastClickedPosition = useAppSelector((state) => state.utils);
 
   const [draggedChip, setDraggedChip] = useState<ChipId | null>(null);
   const [draggedChipPosition, setDraggedChipPosition] = useState<ChipPosition>({
@@ -94,7 +91,7 @@ export function ProcessorBoard(props: {
     }
 
     dispatch(
-      Actions.moveChip({
+      ChipSlice.actions.moveChip({
         chipId: chipId as ChipId,
         x: calculateChipPositionFromBrowser(event.pageX),
         y: calculateChipPositionFromBrowser(event.pageY),
@@ -115,19 +112,19 @@ export function ProcessorBoard(props: {
       element.classList.contains("processor-board") ||
       element.classList.contains("chip")
     ) {
-      if (sidebarType === "CLOSED") {
-        dispatch(SidebarActions.setSidebar("CHIPS"));
+      if (sidebarType === "DEFAULT") {
+        dispatch(SidebarSlice.actions.setSidebar("CHIPS"));
       }
 
       dispatch(
-        Actions.updateLastClickedPosition({
+        UtilsSlice.actions.updateLastClickedPosition({
           x: calculateChipPositionFromBrowser(event.pageX),
           y: calculateChipPositionFromBrowser(event.pageY),
           processorId: props.chipId,
         }),
       );
     } else if (element.classList.contains("last-clicked-position")) {
-      dispatch(Actions.updateLastClickedPosition(null));
+      dispatch(UtilsSlice.actions.updateLastClickedPosition(null));
     }
   };
 
@@ -195,10 +192,10 @@ export function ProcessorBoard(props: {
 export function Connection(props: { connection: ChipConnection }) {
   const dispatch = useAppDispatch();
   const pos1 = useAppSelector(
-    (state) => state.motherboard.chips[props.connection.output.chipId],
+    (state) => state.chips[props.connection.output.chipId],
   );
   const pos2 = useAppSelector(
-    (state) => state.motherboard.chips[props.connection.input.chipId],
+    (state) => state.chips[props.connection.input.chipId],
   );
   const [_, setState] = useState(0);
 
@@ -225,7 +222,7 @@ export function Connection(props: { connection: ChipConnection }) {
 
   const handleAuxClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     if (event.button === 1) {
-      dispatch(Actions.removeConnection(props.connection));
+      dispatch(ConnectionSlice.actions.removeConnection(props.connection));
     }
   };
 

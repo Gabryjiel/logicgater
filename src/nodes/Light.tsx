@@ -4,7 +4,7 @@ import { BasicChip } from "./Basic";
 
 export function Light(props: { chipId: ChipId }) {
   const data = useAppSelector(
-    (state) => state.motherboard.chips[props.chipId],
+    (state) => state.chips[props.chipId],
   ) as LightChip;
 
   return (

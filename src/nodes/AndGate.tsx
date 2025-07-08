@@ -4,7 +4,7 @@ import { BasicChip } from "./Basic";
 
 export function AndGate(props: { chipId: ChipId }) {
   const data = useAppSelector(
-    (state) => state.motherboard.chips[props.chipId],
+    (state) => state.chips[props.chipId],
   ) as AndGateChip;
 
   return (

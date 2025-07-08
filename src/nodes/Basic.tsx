@@ -7,7 +7,10 @@ import type {
   ChipPosition,
   ChipType,
 } from "../nodes";
-import { Actions, SidebarActions, useAppDispatch } from "../providers/redux";
+import { useAppDispatch } from "../providers/redux";
+import { ChipSlice } from "../providers/redux/chips";
+import { ConnectionSlice } from "../providers/redux/connections";
+import { SidebarSlice } from "../providers/redux/sidebar";
 
 export function BasicChip(props: {
   chipId: ChipId;
@@ -28,14 +31,12 @@ export function BasicChip(props: {
 
   const handleAuxClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     if (event.button === 1) {
-      dispatch(Actions.removeChip(props.chipId));
+      dispatch(ChipSlice.actions.removeChip(props.chipId));
     }
   };
 
-  const handleOnClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
-    event.preventDefault();
-
-    dispatch(SidebarActions.toggle(props.type));
+  const handleOnClick = () => {
+    dispatch(SidebarSlice.actions.toggle(props.type));
   };
 
   return (
@@ -47,6 +48,7 @@ export function BasicChip(props: {
       }}
       onClick={handleOnClick}
       onAuxClick={handleAuxClick}
+      onKeyDown={handleOnClick}
       title={props.title}
     >
       <div className="chip" draggable="true" onDragStart={handleDragStart}>
@@ -139,7 +141,7 @@ export function ChipInput(props: {
 
     if (outputId && inputId) {
       dispatch(
-        Actions.addConnection({
+        ConnectionSlice.actions.addConnection({
           input: {
             chipId: inputChipId,
             inputId,
