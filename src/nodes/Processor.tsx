@@ -1,4 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
+import { useBoolean } from "../lib/useBoolean";
+import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
+import { useAppDispatch, useAppSelector } from "../providers/redux";
+import { ChipSlice } from "../providers/redux/chips";
+import { ConnectionSlice } from "../providers/redux/connections";
+import { SidebarSlice } from "../providers/redux/sidebar";
+import { UtilsSlice } from "../providers/redux/utils";
 import type {
   ChipConnection,
   ChipId,
@@ -6,19 +14,11 @@ import type {
   ProcessorChip,
   ProcessorSubchip,
 } from ".";
-import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
-import { useBoolean } from "../lib/useBoolean";
-import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
-import { useAppDispatch, useAppSelector } from "../providers/redux";
 import { AndGate } from "./AndGate";
 import { BasicChip } from "./Basic";
 import { BatteryChip } from "./Battery";
 import { Light } from "./Light";
 import { Timer } from "./Timer";
-import { ChipSlice } from "../providers/redux/chips";
-import { UtilsSlice } from "../providers/redux/utils";
-import { ConnectionSlice } from "../providers/redux/connections";
-import { SidebarSlice } from "../providers/redux/sidebar";
 
 export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
@@ -36,14 +36,12 @@ export function Processor(props: { chipId: ChipId }) {
         position={chip.position}
         title={`${chip.type}\n${chip.name}`}
       />
-      {boardOpenBool.value ? (
+      {boardOpenBool.value && (
         <ProcessorBoard
           chipId={chip.id}
           chips={chip.chips}
           connections={chip.connections}
         />
-      ) : (
-        <></>
       )}
     </>
   );
@@ -55,7 +53,7 @@ export function ProcessorBoard(props: {
   connections: ChipConnection[];
 }) {
   const dispatch = useAppDispatch();
-  const sidebarType = useAppSelector((state) => state.sidebar);
+  const sidebar = useAppSelector((state) => state.sidebar);
   const lastClickedPosition = useAppSelector((state) => state.utils);
 
   const [draggedChip, setDraggedChip] = useState<ChipId | null>(null);
@@ -112,8 +110,8 @@ export function ProcessorBoard(props: {
       element.classList.contains("processor-board") ||
       element.classList.contains("chip")
     ) {
-      if (sidebarType === "DEFAULT") {
-        dispatch(SidebarSlice.actions.setSidebar("CHIPS"));
+      if (sidebar?.type !== "CHIPS") {
+        dispatch(SidebarSlice.actions.setSidebar({ type: "CHIPS" }));
       }
 
       dispatch(
@@ -128,7 +126,78 @@ export function ProcessorBoard(props: {
     }
   };
 
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (lastClickedPosition !== null) {
+          const newPosition = { ...lastClickedPosition };
+
+          if (event.key === "ArrowUp") {
+            if (newPosition.y <= 0) {
+              return;
+            }
+
+            newPosition.y--;
+          } else if (event.key === "ArrowDown") {
+            newPosition.y++;
+          } else if (event.key === "ArrowLeft") {
+            if (newPosition.x <= 0) {
+              return;
+            }
+
+            newPosition.x--;
+          } else if (event.key === "ArrowRight") {
+            newPosition.x++;
+          } else if (event.key === "Enter") {
+            if (props.chipId !== lastClickedPosition.processorId) {
+              return;
+            }
+
+            const chip = props.chips.find(
+              (chip) =>
+                chip.position.x === lastClickedPosition.x &&
+                chip.position.y === lastClickedPosition.y,
+            );
+
+            if (!chip) {
+              if (sidebar?.type !== "CHIPS") {
+                dispatch(SidebarSlice.actions.setSidebar({ type: "CHIPS" }));
+              }
+
+              return;
+            }
+
+            return dispatch(
+              SidebarSlice.actions.setSidebar({
+                type: chip.type,
+                chipId: chip.chipId,
+              }),
+            );
+          }
+
+          if (
+            newPosition.x !== lastClickedPosition.x ||
+            newPosition.y !== lastClickedPosition.y
+          ) {
+            dispatch(UtilsSlice.actions.updateLastClickedPosition(newPosition));
+          }
+        }
+      },
+      {
+        signal: abortController.signal,
+      },
+    );
+
+    return () => {
+      abortController.abort();
+    };
+  }, [dispatch, lastClickedPosition, sidebar, props.chipId, props.chips]);
+
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: it cant be a button
     <div
       className="processor-board"
       onDragEnter={handleDragEnter}
@@ -151,15 +220,40 @@ export function ProcessorBoard(props: {
       {props.chips.map((chip) => {
         switch (chip.type) {
           case "PROCESSOR":
-            return <Processor key={chip.chipId} chipId={chip.chipId} />;
+            return (
+              <Processor
+                key={chip.chipId}
+                chipId={chip.chipId}
+              />
+            );
           case "BATTERY":
-            return <BatteryChip key={chip.chipId} chipId={chip.chipId} />;
+            return (
+              <BatteryChip
+                key={chip.chipId}
+                chipId={chip.chipId}
+              />
+            );
           case "AND_GATE":
-            return <AndGate key={chip.chipId} chipId={chip.chipId} />;
+            return (
+              <AndGate
+                key={chip.chipId}
+                chipId={chip.chipId}
+              />
+            );
           case "TIMER":
-            return <Timer key={chip.chipId} chipId={chip.chipId} />;
+            return (
+              <Timer
+                key={chip.chipId}
+                chipId={chip.chipId}
+              />
+            );
           case "LIGHT":
-            return <Light key={chip.chipId} chipId={chip.chipId} />;
+            return (
+              <Light
+                key={chip.chipId}
+                chipId={chip.chipId}
+              />
+            );
           default:
             return null;
         }
@@ -174,7 +268,7 @@ export function ProcessorBoard(props: {
         );
       })}
 
-      {draggedChip ? (
+      {draggedChip !== null && (
         <div
           className="chip-outline"
           style={{
@@ -182,8 +276,6 @@ export function ProcessorBoard(props: {
             top: `${draggedChipPosition.y * PIXELS_PER_CHIP}px`,
           }}
         />
-      ) : (
-        <></>
       )}
     </div>
   );

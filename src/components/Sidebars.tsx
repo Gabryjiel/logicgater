@@ -7,16 +7,16 @@ import "./sidebars.css";
 import { SidebarSlice } from "../providers/redux/sidebar";
 
 export function Sidebars() {
-  const sidebarType = useAppSelector((state) => state.sidebar);
+  const sidebar = useAppSelector((state) => state.sidebar);
 
-  if (sidebarType === "DEFAULT") {
+  if (sidebar === null) {
     return null;
   }
 
   return (
     <SidebarContainer>
-      {sidebarType === "CHIPS" && <SidebarChips />}
-      {sidebarType === "BATTERY" && <SidebarBattery />}
+      {sidebar.type === "CHIPS" && <SidebarChips />}
+      {sidebar.type === "BATTERY" && <SidebarBattery />}
     </SidebarContainer>
   );
 }
@@ -34,7 +34,7 @@ export function SidebarHeader(props: { title: string }) {
 
   const onCloseClick: React.MouseEventHandler<HTMLButtonElement> = (event) => {
     event.preventDefault();
-    dispatch(SidebarSlice.actions.setSidebar("DEFAULT"));
+    dispatch(SidebarSlice.actions.close());
   };
 
   return (

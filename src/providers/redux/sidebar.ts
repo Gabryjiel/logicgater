@@ -1,18 +1,26 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { ChipType } from "../../nodes";
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { ChipId, ChipType } from "../../nodes";
 
-export type SidebarType = "DEFAULT" | "CHIPS" | ChipType;
+export type SidebarType =
+| { type: "CHIPS" }
+| { type: ChipType, chipId: ChipId };
 
 export const SidebarSlice = createSlice({
-	name: "sidebar",
-	initialState: "DEFAULT" as SidebarType,
-	reducers: {
-		setSidebar: (_, action: PayloadAction<SidebarType>) => {
-			return action.payload;
-		},
-		toggle: (state, action: PayloadAction<SidebarType>) => {
-      return state === action.payload ? "DEFAULT" : action.payload;
-		},
-	},
-});
+  name: "sidebar",
+  initialState: null as null | SidebarType,
+  reducers: {
+    setSidebar: (_, action: PayloadAction<SidebarType>) => {
+      return action.payload;
+    },
+    close: () => {
+      return null;
+    },
+    toggle: (state, action: PayloadAction<SidebarType>) => {
+      if (state !== null && state.type !== action.payload.type) {
+        return action.payload;
+      }
 
+      return null;
+    },
+  },
+});

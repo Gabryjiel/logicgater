@@ -8,7 +8,7 @@ export function SidebarBattery() {
     <>
       <SidebarHeader title="Battery" />
       <SidebarGroup>
-        <input type="text" placeholder="Name" />
+        <input ref={(el) => el?.focus()} type="text" placeholder="Name" />
       </SidebarGroup>
     </>
   );

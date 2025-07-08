@@ -70,15 +70,13 @@ export function BasicChip(props: {
       <div className="chip-bottom-inputs">
         {props.inputs
           .filter((input) => input.placement === "BOTTOM")
-          .map((input) => {
-            return (
-              <ChipInput
-                key={`${props.chipId}:${input.inputId}`}
-                chipId={props.chipId}
-                inputId={input.inputId}
-              />
-            );
-          })}
+          .map((input) => (
+            <ChipInput
+              key={`${props.chipId}:${input.inputId}`}
+              chipId={props.chipId}
+              inputId={input.inputId}
+            />
+          ))}
       </div>
       <div className="chip-right-outputs">
         {props.outputs.map((output) => {

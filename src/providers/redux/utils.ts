@@ -1,7 +1,7 @@
-import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 import type { ChipId, ChipPosition } from "../../nodes";
+import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
 
-type ClickPosition = { processorId: ChipId } & ChipPosition;
+export type ClickPosition = { processorId: ChipId } & ChipPosition;
 
 export const UtilsSlice = createSlice({
   name: 'utils',

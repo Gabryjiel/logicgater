@@ -36,7 +36,11 @@ export type BasicChip = {
   inputs: ChipInput[];
 };
 
-export type ProcessorSubchip = { chipId: ChipId; type: ChipType };
+export type ProcessorSubchip = {
+  chipId: ChipId;
+  type: ChipType;
+  position: ChipPosition;
+};
 
 export type ProcessorChip = BasicChip & {
   type: "PROCESSOR";
