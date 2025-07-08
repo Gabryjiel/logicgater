@@ -1,10 +1,19 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.7.3/schema.json",
-  "organizeImports": {
-    "enabled": true
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "root": true,
+  "json": {
+    "linter": {
+      "enabled": false
+    },
+    "formatter": {
+      "enabled": false
+    }
   },
   "linter": {
     "enabled": true,
+    "domains": {
+      "react": "recommended"
+    },
     "rules": {
       "recommended": true
     }
@@ -12,7 +21,9 @@
   "formatter": {
     "lineEnding": "lf",
     "enabled": true,
-    "lineWidth": 80
+    "lineWidth": 80,
+    "bracketSpacing": true,
+    "attributePosition": "auto"
   },
   "javascript": {
     "formatter": {
