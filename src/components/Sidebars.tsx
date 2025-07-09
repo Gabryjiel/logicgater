@@ -1,10 +1,12 @@
+import { IoHome } from "react-icons/io5";
 import { useAppDispatch, useAppSelector } from "../providers/redux";
 import { SidebarBattery } from "./SidebarBattery";
 import { SidebarChips } from "./SidebarChips";
-import { IoHome } from "react-icons/io5";
 
 import "./sidebars.css";
-import { SidebarSlice } from "../providers/redux/sidebar";
+import { focusMarker } from "../providers/redux/marker";
+import { close, SidebarSlice } from "../providers/redux/sidebar";
+import { useEffect, useRef } from "react";
 
 export function Sidebars() {
   const sidebar = useAppSelector((state) => state.sidebar);
@@ -22,7 +24,27 @@ export function Sidebars() {
 }
 
 export function SidebarContainer(props: { children: React.ReactNode }) {
-  return <aside id="sidebar">{props.children}</aside>;
+  const ref = useRef<HTMLElement>(null);
+  const sidebar = useAppSelector((state) => state.sidebar);
+  const dispatch = useAppDispatch();
+
+  const handleKeyUp: React.KeyboardEventHandler<HTMLElement> = (event) => {
+    console.log(event);
+    if (event.key === "Escape") {
+      dispatch(close());
+      dispatch(focusMarker());
+    }
+  };
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, [sidebar?.type])
+
+  return (
+    <aside id="sidebar" ref={ref} onKeyUp={handleKeyUp} tabIndex={-1}>
+      {props.children}
+    </aside>
+  );
 }
 
 export function SidebarGroup(props: { children: React.ReactNode }) {

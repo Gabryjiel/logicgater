@@ -2,9 +2,10 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { ChipSlice } from "./redux/chips";
 import { ConnectionSlice } from "./redux/connections";
-import { UtilsSlice } from "./redux/utils";
+import { MarkerReducer } from "./redux/marker";
 import { SidebarSlice } from "./redux/sidebar";
 import { UndoSlice } from "./redux/undo";
+import { UtilsSlice } from "./redux/utils";
 //
 // const listener = createListenerMiddleware();
 // const startListening = listener.startListening.withTypes<
@@ -58,16 +59,17 @@ import { UndoSlice } from "./redux/undo";
 // });
 //
 export const store = configureStore({
-	reducer: {
+  reducer: {
     chips: ChipSlice.reducer,
     connections: ConnectionSlice.reducer,
-		undo: UndoSlice.reducer,
+    undo: UndoSlice.reducer,
     utils: UtilsSlice.reducer,
-		sidebar: SidebarSlice.reducer,
-	},
-	devTools: true,
-	// middleware: (getDefaultMiddleware) =>
-		// getDefaultMiddleware().prepend(listener.middleware),
+    sidebar: SidebarSlice.reducer,
+    marker: MarkerReducer,
+  },
+  devTools: true,
+  // middleware: (getDefaultMiddleware) =>
+  // getDefaultMiddleware().prepend(listener.middleware),
 });
 
 type AppDispatch = typeof store.dispatch;

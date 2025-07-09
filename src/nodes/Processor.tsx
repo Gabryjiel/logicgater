@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { calculateChipPositionFromBrowser } from "../lib/chipUtils";
 import { useBoolean } from "../lib/useBoolean";
 import { DRAG_TYPES, PIXELS_PER_CHIP } from "../providers/constants";
 import { useAppDispatch, useAppSelector } from "../providers/redux";
 import { ChipSlice } from "../providers/redux/chips";
 import { ConnectionSlice } from "../providers/redux/connections";
-import { SidebarSlice } from "../providers/redux/sidebar";
-import { UtilsSlice } from "../providers/redux/utils";
+import { openSidebar, SidebarSlice } from "../providers/redux/sidebar";
 import type {
   ChipConnection,
   ChipId,
@@ -19,6 +18,17 @@ import { BasicChip } from "./Basic";
 import { BatteryChip } from "./Battery";
 import { Light } from "./Light";
 import { Timer } from "./Timer";
+import {
+  blurMarker,
+  holdWithMarker,
+  moveMarkerDown,
+  moveMarkerLeft,
+  moveMarkerRight,
+  moveMarkerTo,
+  moveMarkerUp,
+  releaseFromMarker,
+} from "../providers/redux/marker";
+import { Marker } from "../components/Marker";
 
 export function Processor(props: { chipId: ChipId }) {
   const boardOpenBool = useBoolean();
@@ -54,7 +64,7 @@ export function ProcessorBoard(props: {
 }) {
   const dispatch = useAppDispatch();
   const sidebar = useAppSelector((state) => state.sidebar);
-  const lastClickedPosition = useAppSelector((state) => state.utils);
+  const marker = useAppSelector((state) => state.marker);
 
   const [draggedChip, setDraggedChip] = useState<ChipId | null>(null);
   const [draggedChipPosition, setDraggedChipPosition] = useState<Position>({
@@ -104,97 +114,71 @@ export function ProcessorBoard(props: {
 
   const handleClick: React.MouseEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault();
+    (event.target as HTMLDivElement).focus();
     const element = event.target as HTMLElement;
 
     if (
       element.classList.contains("processor-board") ||
       element.classList.contains("chip")
     ) {
-      if (sidebar?.type !== "CHIPS") {
-        dispatch(SidebarSlice.actions.setSidebar({ type: "CHIPS" }));
-      }
+      // if (sidebar?.type !== "CHIPS") {
+      //   dispatch(SidebarSlice.actions.openSidebar({ type: "CHIPS" }));
+      // }
 
       dispatch(
-        UtilsSlice.actions.updateLastClickedPosition({
-          x: calculateChipPositionFromBrowser(event.pageX),
-          y: calculateChipPositionFromBrowser(event.pageY),
-          processorId: props.chipId,
+        moveMarkerTo({
+          position: {
+            x: calculateChipPositionFromBrowser(event.pageX),
+            y: calculateChipPositionFromBrowser(event.pageY),
+          },
+          processorBoardId: props.chipId,
         }),
       );
     } else if (element.classList.contains("last-clicked-position")) {
-      dispatch(UtilsSlice.actions.updateLastClickedPosition(null));
+      dispatch(blurMarker());
     }
   };
 
-  useEffect(() => {
-    const abortController = new AbortController();
+  const handleKeyUp: React.KeyboardEventHandler<HTMLDivElement> = (event) => {
+    if (marker.status === "idle") {
+      return;
+    }
 
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (lastClickedPosition !== null) {
-          const newPosition = { ...lastClickedPosition };
+    if (event.key === "ArrowUp") {
+      dispatch(moveMarkerUp());
+    } else if (event.key === "ArrowDown") {
+      dispatch(moveMarkerDown());
+    } else if (event.key === "ArrowLeft") {
+      dispatch(moveMarkerLeft());
+    } else if (event.key === "ArrowRight") {
+      dispatch(moveMarkerRight());
+    } else if (event.key === "Enter") {
+      if (marker.status === "placed") {
+        const markedChip = props.chips.find(
+          (chip) =>
+            chip.position.x === marker.position.x &&
+            chip.position.y === marker.position.y,
+        );
 
-          if (event.key === "ArrowUp") {
-            if (newPosition.y <= 0) {
-              return;
-            }
-
-            newPosition.y--;
-          } else if (event.key === "ArrowDown") {
-            newPosition.y++;
-          } else if (event.key === "ArrowLeft") {
-            if (newPosition.x <= 0) {
-              return;
-            }
-
-            newPosition.x--;
-          } else if (event.key === "ArrowRight") {
-            newPosition.x++;
-          } else if (event.key === "Enter") {
-            if (props.chipId !== lastClickedPosition.processorId) {
-              return;
-            }
-
-            const chip = props.chips.find(
-              (chip) =>
-                chip.position.x === lastClickedPosition.x &&
-                chip.position.y === lastClickedPosition.y,
-            );
-
-            if (!chip) {
-              if (sidebar?.type !== "CHIPS") {
-                dispatch(SidebarSlice.actions.setSidebar({ type: "CHIPS" }));
-              }
-
-              return;
-            }
-
-            return dispatch(
-              SidebarSlice.actions.setSidebar({
-                type: chip.type,
-                chipId: chip.chipId,
-              }),
-            );
-          }
-
-          if (
-            newPosition.x !== lastClickedPosition.x ||
-            newPosition.y !== lastClickedPosition.y
-          ) {
-            dispatch(UtilsSlice.actions.updateLastClickedPosition(newPosition));
-          }
+        if (markedChip === undefined) {
+          dispatch(openSidebar({ type: "CHIPS" }));
+          dispatch(blurMarker());
+        } else {
+          dispatch(holdWithMarker(markedChip.chipId));
         }
-      },
-      {
-        signal: abortController.signal,
-      },
-    );
+      } else if (marker.status === "holding") {
+        dispatch(releaseFromMarker());
+      }
+    }
+  };
 
-    return () => {
-      abortController.abort();
-    };
-  }, [dispatch, lastClickedPosition, sidebar, props.chipId, props.chips]);
+  const boardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (sidebar === null) {
+      boardRef.current?.focus();
+    }
+  }, [sidebar])
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: it cant be a button
@@ -205,55 +189,24 @@ export function ProcessorBoard(props: {
       onDrop={handleDrop}
       onDragLeave={handleDragLeave}
       onClick={handleClick}
-      onKeyDown={() => null}
+      onKeyDown={handleKeyUp}
+      ref={boardRef}
+      tabIndex={-1}
     >
-      {props.chipId === lastClickedPosition?.processorId ? (
-        <div
-          className="last-clicked-position"
-          style={{
-            top: PIXELS_PER_CHIP * lastClickedPosition.y,
-            left: PIXELS_PER_CHIP * lastClickedPosition.x,
-          }}
-        />
-      ) : null}
+      {props.chipId === marker.processorBoardId && <Marker />}
 
       {props.chips.map((chip) => {
         switch (chip.type) {
           case "PROCESSOR":
-            return (
-              <Processor
-                key={chip.chipId}
-                chipId={chip.chipId}
-              />
-            );
+            return <Processor key={chip.chipId} chipId={chip.chipId} />;
           case "BATTERY":
-            return (
-              <BatteryChip
-                key={chip.chipId}
-                chipId={chip.chipId}
-              />
-            );
+            return <BatteryChip key={chip.chipId} chipId={chip.chipId} />;
           case "AND_GATE":
-            return (
-              <AndGate
-                key={chip.chipId}
-                chipId={chip.chipId}
-              />
-            );
+            return <AndGate key={chip.chipId} chipId={chip.chipId} />;
           case "TIMER":
-            return (
-              <Timer
-                key={chip.chipId}
-                chipId={chip.chipId}
-              />
-            );
+            return <Timer key={chip.chipId} chipId={chip.chipId} />;
           case "LIGHT":
-            return (
-              <Light
-                key={chip.chipId}
-                chipId={chip.chipId}
-              />
-            );
+            return <Light key={chip.chipId} chipId={chip.chipId} />;
           default:
             return null;
         }

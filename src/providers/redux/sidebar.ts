@@ -2,14 +2,14 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { ChipId, ChipType } from "../../nodes";
 
 export type SidebarType =
-| { type: "CHIPS" }
-| { type: ChipType, chipId: ChipId };
+  | { type: "CHIPS" }
+  | { type: ChipType; chipId: ChipId };
 
 export const SidebarSlice = createSlice({
   name: "sidebar",
   initialState: null as null | SidebarType,
   reducers: {
-    setSidebar: (_, action: PayloadAction<SidebarType>) => {
+    openSidebar: (_, action: PayloadAction<SidebarType>) => {
       return action.payload;
     },
     close: () => {
@@ -24,3 +24,5 @@ export const SidebarSlice = createSlice({
     },
   },
 });
+
+export const { close, openSidebar, toggle } = SidebarSlice.actions;
