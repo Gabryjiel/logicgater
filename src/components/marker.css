@@ -1,0 +1,31 @@
+.marker {
+  z-index: var(--z-index-lastclicked);
+  width: var(--pixels-per-chip);
+  height: var(--pixels-per-chip);
+  position: absolute;
+  transition:
+    top ease-in 0.1s,
+    left ease-in 0.1s;
+
+  --s: 10px; /* size of the corners */
+  border-width: 5px;
+  border-style: solid;
+  padding: 0px;
+  background: transparent content-box;
+  mask:
+    conic-gradient(#000 0 0) content-box,
+    conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 /
+      calc(100% - var(--s)) calc(100% - var(--s));
+
+  &.idle {
+    border-color: gray;
+  }
+
+  &.placed {
+    border-color: yellow;
+  }
+
+  &.holding {
+    border-color: red;;
+  }
+}
