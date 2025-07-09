@@ -10,7 +10,7 @@ import { UtilsSlice } from "../providers/redux/utils";
 import type {
   ChipConnection,
   ChipId,
-  ChipPosition,
+  Position,
   ProcessorChip,
   ProcessorSubchip,
 } from ".";
@@ -57,7 +57,7 @@ export function ProcessorBoard(props: {
   const lastClickedPosition = useAppSelector((state) => state.utils);
 
   const [draggedChip, setDraggedChip] = useState<ChipId | null>(null);
-  const [draggedChipPosition, setDraggedChipPosition] = useState<ChipPosition>({
+  const [draggedChipPosition, setDraggedChipPosition] = useState<Position>({
     x: 0,
     y: 0,
   });

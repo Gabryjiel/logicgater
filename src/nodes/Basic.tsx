@@ -4,7 +4,7 @@ import type {
   ChipId,
   ChipInputId,
   ChipOutputId,
-  ChipPosition,
+  Position,
   ChipType,
 } from "../nodes";
 import { useAppDispatch } from "../providers/redux";
@@ -17,7 +17,7 @@ export function BasicChip(props: {
   children?: React.ReactNode;
   inputs: { inputId: ChipInputId; placement: "LEFT" | "BOTTOM" }[];
   outputs: { outputId: ChipOutputId; placement: "RIGHT" }[];
-  position: ChipPosition;
+  position: Position;
   type: ChipType;
   title: string;
 }): React.ReactNode {

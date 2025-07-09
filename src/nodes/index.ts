@@ -26,12 +26,12 @@ export type ChipConnection = {
   output: { chipId: ChipId; outputId: ChipOutputId };
 };
 
-export type ChipPosition = { x: number; y: number };
+export type Position = { x: number; y: number };
 
 export type BasicChip = {
   id: ChipId;
   name: string;
-  position: ChipPosition;
+  position: Position;
   outputs: ChipOutput[];
   inputs: ChipInput[];
 };
@@ -39,7 +39,7 @@ export type BasicChip = {
 export type ProcessorSubchip = {
   chipId: ChipId;
   type: ChipType;
-  position: ChipPosition;
+  position: Position;
 };
 
 export type ProcessorChip = BasicChip & {
@@ -82,7 +82,7 @@ let positionX = 0;
 export const chipFactory = {
   createBasicChip(
     type: ChipType,
-    config?: { position?: ChipPosition },
+    config?: { position?: Position },
   ): BasicChip {
     return {
       id: `${type}_${++chipCounter}` as ChipId,
@@ -106,7 +106,7 @@ export const chipFactory = {
   ): ChipInput {
     return { inputId: `${chipId}_INPUT_${num}` as ChipInputId, placement };
   },
-  createProcessor(config?: { position: ChipPosition }): ProcessorChip {
+  createProcessor(config?: { position: Position }): ProcessorChip {
     return {
       ...this.createBasicChip("PROCESSOR", config),
       type: "PROCESSOR",
@@ -117,7 +117,7 @@ export const chipFactory = {
   },
   createBattery(config?: {
     power?: number;
-    position?: ChipPosition;
+    position?: Position;
   }): BatteryChip {
     const basicChip = this.createBasicChip("BATTERY", {
       position: config?.position,
@@ -132,7 +132,7 @@ export const chipFactory = {
       outputs: [this.createOutput(basicChip.id, 1, config?.power ?? 100)],
     };
   },
-  createAndGate(config?: { position?: ChipPosition }): AndGateChip {
+  createAndGate(config?: { position?: Position }): AndGateChip {
     const basicChip = this.createBasicChip("AND_GATE", config);
     return {
       ...basicChip,
@@ -146,7 +146,7 @@ export const chipFactory = {
   },
   createTimer(config?: {
     durationMs?: number;
-    position?: ChipPosition;
+    position?: Position;
   }): TimerChip {
     const basicChip = this.createBasicChip("TIMER", {
       position: config?.position,
@@ -162,7 +162,7 @@ export const chipFactory = {
       outputs: [this.createOutput(basicChip.id, 1)],
     };
   },
-  createLight(config?: { position: ChipPosition }): LightChip {
+  createLight(config?: { position: Position }): LightChip {
     const basicChip = this.createBasicChip("LIGHT", config);
 
     return {
@@ -173,7 +173,7 @@ export const chipFactory = {
       value: 0,
     };
   },
-  create(chipType: string, config?: { position: ChipPosition }): AnyChip {
+  create(chipType: string, config?: { position: Position }): AnyChip {
     switch (chipType as ChipType) {
       case "BATTERY":
         return this.createBattery(config);

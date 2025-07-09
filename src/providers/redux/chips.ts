@@ -1,5 +1,5 @@
 import { type PayloadAction, createSlice } from "@reduxjs/toolkit";
-import type { AnyChip, ChipId, ChipPosition } from "../../nodes";
+import type { AnyChip, ChipId, Position } from "../../nodes";
 
 export const ChipSlice = createSlice({
 	name: "chips",
@@ -13,7 +13,7 @@ export const ChipSlice = createSlice({
 		},
 		moveChip: (
 			state,
-			action: PayloadAction<ChipPosition & { chipId: ChipId }>,
+			action: PayloadAction<Position & { chipId: ChipId }>,
 		) => {
 			const chip = state[action.payload.chipId];
 
